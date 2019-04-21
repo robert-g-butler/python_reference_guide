@@ -28,7 +28,9 @@ class User(Base):
     nickname = Column(String)
 
     def __repr__(self):
-        return f'<User(name={self.name}, fullname={self.fullname}, nickname={self.nickname})>'
+        return (f'<User(name={self.name}, '
+                f'fullname={self.fullname}, '
+                f'nickname={self.nickname})>')
 
 # Create a Schema ------------------------------------------------------------
 
@@ -47,9 +49,10 @@ str(ed_user.id)
 from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker(bind=engine)
-# or
-Session = sessionmaker()
-Session.configure(bind=engine)
+
+# or...
+# Session = sessionmaker()
+# Session.configure(bind=engine)
 
 session = Session()
 
@@ -80,18 +83,44 @@ ed_user.id
 
 # Rolling Back ---------------------------------------------------------------
 
+ed_user.name = 'Edwardo'
 
+fake_user = User(name='fakeuser', fullname='Invalid', nickname='12345')
+session.add(fake_user)
 
+session.query(User).filter(User.name.in_(['Edwardo', 'fakeuser'])).all()
 
+session.rollback()
 
+ed_user.name
+fake_user in session
 
+session.query(User).filter(User.name.in_(['ed', 'fakeuser'])).all()
 
+# Querying -------------------------------------------------------------------
 
+session.query(User).order_by(User.id)
 
+for instance in session.query(User).order_by(User.id):
+    print(instance.name, instance.fullname)
 
+for name, fullname in session.query(User.name, User.fullname):
+    print(name, fullname)
 
+for row in session.query(User, User.name).all():
+    print(row.User, row.name)
 
+for row in session.query(User.name.label('name_label')).all():
+    print(row.name_label)
 
+from sqlalchemy.orm import aliased
+
+user_alias = aliased(User, name='user_alias')
+for row in session.query(user_alias, user_alias.name):
+    print(row)
+
+for u in session.query(User).order_by(User.id)[1:3]:
+    print(u)
 
 
 
