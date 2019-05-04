@@ -1,4 +1,4 @@
-
+ 
 # SOURCE: https://docs.sqlalchemy.org/en/13/orm/tutorial.html
 
 import sqlalchemy
@@ -99,6 +99,8 @@ session.query(User).filter(User.name.in_(['ed', 'fakeuser'])).all()
 
 # Querying -------------------------------------------------------------------
 
+from sqlalchemy import and_, or_
+
 session.query(User).order_by(User.id)
 
 for instance in session.query(User).order_by(User.id):
@@ -122,6 +124,48 @@ for row in session.query(user_alias, user_alias.name):
 for u in session.query(User).order_by(User.id)[1:3]:
     print(u)
 
+for name, in session.query(User.name).filter_by(fullname='Ed Jones'):
+    print(name)
 
+for name, in session.query(User.name).filter(User.fullname=='Ed Jones'):
+    print(name)
+
+for user in (
+    session.query(User)
+    .filter(User.name == 'ed')
+    .filter(User.fullname == 'Ed Jones')
+):
+    print(user)
+
+query = session.query(User)
+[user.fullname for user in query.filter(User.name == 'ed')]  # equals
+[user.fullname for user in query.filter(User.name != 'ed')]  # not equals
+[user.fullname for user in query.filter(User.name.like('%ed%'))]  # like
+[user.fullname for user in query.filter(User.name.ilike('%ed%'))]  # case-insensitive like
+[user.fullname for user in query.filter(User.name.in_(['ed', 'wendy', 'jack']))]  # in
+[user.fullname for user in query.filter(~User.name.in_(['ed', 'wendy', 'jack']))]  # not in
+[user.fullname for user in query.filter(User.name == None)]  # is null
+[user.fullname for user in query.filter(User.name.is_(None))]  # is null
+[user.fullname for user in query.filter(User.name != None)]  # is not null
+[user.fullname for user in query.filter(User.name.isnot(None))]  # is not null
+[user.fullname for user in query.filter(and_(User.name == 'ed', User.fullname == 'Ed Jones'))]  # and
+[user.fullname for user in query.filter(User.name == 'ed', User.fullname == 'Ed Jones')]  # and
+[user.fullname for user in query.filter(User.name == 'ed').filter(User.fullname == 'Ed Jones')]  # and
+[user.fullname for user in query.filter(or_(User.name == 'ed', User.name == 'wendy'))]  # or
+[user.fullname for user in query.filter(User.name.match('wendy'))]  # match
+
+# Returning Lists and Scalars ------------------------------------------------
+
+query = session.query(User).filter(User.name.like('%ed')).order_by(User.id)
+
+query.all()
+query.first()
+query.one()
+
+query = session.query(User.id).filter(User.name == 'ed').order_by(User.id)
+
+query.one()
+query.one_or_none()
+query.scalar()
 
 
