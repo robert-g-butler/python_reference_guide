@@ -56,6 +56,7 @@ df_b.values
 df_b.shift(periods = 1)
 df_b.sub(100)
 df_b.add(100)
+df_a.info()
 df_a.describe()  # Summary Metrics
 df_a.T  # Transpose
 df_a.transpose()  # Same thing as T
