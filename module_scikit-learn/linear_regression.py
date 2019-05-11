@@ -1,6 +1,9 @@
 '''
 This script contains examples of Linear Regression analysis, using the SciKit-
 Learn library.
+
+Linear regression is useful when trying to predict from a set of continuous
+data.
 '''
 
 import pandas as pd
@@ -11,8 +14,8 @@ import seaborn as sns
 from sklearn.datasets import load_boston
 
 boston = load_boston()
-df = pd.DataFrame(data=boston.data, columns=boston.feature_names)
-df['target'] = pd.Series(boston.target)
+df = pd.DataFrame(data=boston['data'], columns=boston['feature_names'])
+df['target'] = pd.Series(boston['target'])
 
 df.columns
 df.info()
@@ -22,11 +25,8 @@ df.head()
 sns.pairplot(df)
 plt.show()
 
-sns.distplot(df['target'])
-plt.show()
-
-sns.heatmap(df.corr(), annot=True, cmap='viridis')
-plt.show()
+sns.distplot(df['target']); plt.show()
+sns.heatmap(df.corr(), annot=True, cmap='viridis'); plt.show()
 
 # Set X and y
 X = df[['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD', 'TAX',
@@ -63,9 +63,11 @@ sns.distplot((y_test-predictions))
 plt.show()
 
 # Evaluation Metrics (Try to minimize all of these) ---------------------------
+
 #   1. Mean Absolute Error (MAE)  -  Simple straight error
 #   2. Mean Squared Error (MSE)  -  Squares means that outliers are more visible
 #   3. Root Mean Squared Error (RMSE)  -  Allows RMSE results to be interpreted in "y" units.
+
 from sklearn import metrics
 
 metrics.mean_absolute_error(y_true=y_test, y_pred=predictions)
